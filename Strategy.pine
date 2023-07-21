@@ -1,0 +1,26 @@
+@version=5
+strategy(Supertrend + RSI Strategy, overlay=true)
+
+ Supertrend Indicator
+atrPeriod = input(10, ATR Length)
+factor = input.float(3.0, Factor, step=0.01)
+
+[supertrend, direction] = ta.supertrend(factor, atrPeriod)
+
+ RSI Indicator
+rsiLengthInput = input.int(14, minval=1, title=RSI Length)
+rsiSourceInput = input.source(close, Source)
+
+up = ta.rma(math.max(ta.change(rsiSourceInput), 0), rsiLengthInput)
+down = ta.rma(-math.min(ta.change(rsiSourceInput), 0), rsiLengthInput)
+rsi = down == 0  100  up == 0  0  100 - (100  (1 + up  down))
+
+ Entry conditions
+enterLong = close  supertrend and rsi  70
+
+ Exit conditions
+exitLong = close  supertrend
+
+ Strategy execution
+strategy.entry(Buy, strategy.long, when = enterLong)
+strategy.close(Buy, when = exitLong)
